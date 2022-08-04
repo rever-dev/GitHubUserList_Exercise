@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.reverchen.githubuserlist_exercise.R
 import com.reverchen.githubuserlist_exercise.databinding.FragmentUserListBinding
@@ -13,6 +14,7 @@ import com.reverchen.githubuserlist_exercise.repository.UserRepo
 import com.reverchen.githubuserlist_exercise.view_model.UserListViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
 
@@ -41,9 +43,16 @@ class UserListFragment : Fragment() {
         _binding.fragUserListRecyclerView.layoutManager = LinearLayoutManager(context)
         _binding.fragUserListRecyclerView.adapter = adapter
         
-        _viewModel.users.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+//        _viewModel.users.observe(viewLifecycleOwner) {
+//            _viewModel.users.value = arrayListOf()
+////            adapter.submitData(it)
+//        }
+        lifecycleScope.launch {
+            _viewModel.fetchUserData().collect {
+                adapter.submitData(it)
+            }
         }
     }
+    
     
 }
